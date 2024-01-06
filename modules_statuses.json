@@ -1,0 +1,18 @@
+{
+    "Banners": true,
+    "Menu": true,
+    "Category": true,
+    "Product": true,
+    "Admin": true,
+    "Common": true,
+    "Order": true,
+    "User": true,
+    "Cart": true,
+    "Page": true,
+    "Payment": true,
+    "Shop": true,
+    "Roles": true,
+    "Brand": true,
+    "TaxRule": true,
+    "Shipping": true
+}

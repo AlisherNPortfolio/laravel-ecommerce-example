@@ -1,0 +1,36 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "module": "esnext",
+        "strict": true,
+        "jsx": "preserve",
+        "moduleResolution": "node",
+        "experimentalDecorators": true,
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "forceConsistentCasingInFileNames": true,
+        "useDefineForClassFields": true,
+        "sourceMap": true,
+        "baseUrl": ".",
+        "types": [
+            "webpack-env",
+            "vite/client"
+        ],
+          "paths": {
+            "@/*": [
+              "modules/Admin/Resources/assets/js/*"
+            ]
+          },
+          "lib": [
+            "esnext",
+            "dom"
+          ]
+    },
+    "include": [
+        "modules/Admin/Resources/assets/js/**/*.ts",
+        "modules/Admin/Resources/assets/js/**/*.tsx",
+        "modules/Admin/Resources/assets/js/**/*.vue"
+    ],
+    "exclude": ["node_modules"]
+}

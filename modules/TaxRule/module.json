@@ -1,0 +1,11 @@
+{
+    "name": "TaxRule",
+    "alias": "taxrule",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\TaxRule\\Providers\\TaxRuleServiceProvider"
+    ],
+    "files": []
+}
