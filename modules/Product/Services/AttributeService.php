@@ -16,8 +16,6 @@ use Modules\Product\Transformers\ProductResource;
 class AttributeService extends BaseService
 {
 
-    private $dtoData;
-
     public function __construct(protected IAttributeRepository $repository, protected IAttributeValueRepository $valueRepository)
     {
     }
@@ -37,15 +35,14 @@ class AttributeService extends BaseService
      *
      * @return JsonResponse
      */
-    public function add()
+    public function add(array $data)
     {
         DB::beginTransaction();
         try {
-            $attribute = $this->repository->create(
-                $this->dtoData->toArray(['name'])
-            ); // ProductDTO
+            $attribute = $this->repository->create(['name' => $data['name']]); // ProductDTO
 
-            $attribute->values()->createMany($this->dtoData->values);
+
+            $attribute->values()->createMany($data['values']);
 
             DB::commit();
             return $this->jsonSuccess('Created!');
@@ -58,22 +55,16 @@ class AttributeService extends BaseService
         }
     }
 
-    public function update()
+    public function update(array $data, int $id)
     {
         DB::beginTransaction();
         try {
-            $attributeDto = $this->dtoData;
-            $attribute = $this->repository->find($attributeDto->id);
+            $attribute = $this->repository->find($id);
             abort_if(!$attribute, 404, 'Attribute not found');
 
-            $attribute->update(
-                $attributeDto->toArray(['name'])
-            );
+            $attribute->update(['name' => $data['name']]);
 
-            $this->valueRepository->updateMultiple(
-                $this->dtoData->values,
-                $attribute->id
-            );
+            $this->valueRepository->updateMultiple($data['values'], $id);
 
             // foreach ($this->dtoData->values as $value) {
             //     $this->valueRepository->updateMultiple($value, $attribute->id);
@@ -112,33 +103,5 @@ class AttributeService extends BaseService
                 env_dependend_error($e->getMessage())
             );
         }
-    }
-
-    /**
-     * Insert data from request into DTO objects
-     *
-     * @param array $data
-     * @param integer|null $id
-     * @return static
-     */
-    public function insertIntoDTO(array $data, int $id = null)
-    {
-        // if (isset($data['values'])) {
-        //     $values = [];
-        //     foreach ($data['values'] as $value) {
-        //         $values[] = new AttributeValueDTO($value);
-        //     }
-        //     if (count($values) > 0) {
-        //         $data['values'] = $values;
-        //     }
-        // }
-        
-        if ($id) {
-            $data['id'] = $id;
-        }
-
-        $this->dtoData = new AttributeDTO($data);
-
-        return $this;
     }
 }

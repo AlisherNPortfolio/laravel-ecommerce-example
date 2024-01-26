@@ -50,7 +50,6 @@ class ProductController extends Controller
     {
         $data = $request->validated();
         return $this->productService
-                    ->insertIntoDTO($data)
                     ->add();
     }
 
@@ -90,8 +89,7 @@ class ProductController extends Controller
     {
         $data = $request->validated();
         return $this->productService
-                    ->insertIntoDTO($data, $product)
-                    ->update();
+                    ->update($data, $product);
     }
 
     /**

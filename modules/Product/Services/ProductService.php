@@ -39,17 +39,18 @@ class ProductService extends BaseService
      *
      * @return JsonResponse
      */
-    public function add()
+    public function add(array $data)
     {
         DB::beginTransaction();
         try {
-            $product = $this->repository->create(
-                $this->dtoData->toArray(['images', 'videos'], true)
-            ); // ProductDTO
+            $images = $data['images'];
+            $videos = isset($data['videos']) ? $data['videos'] : [];
+            unset($data['images'], $data['videos']);
+            $product = $this->repository->create($data); // ProductDTO
 
             $this->mediaRepository->uploadMedia([
-                ...$this->dtoData->images,
-                ...(isset($this->dtoData->videos) ? $this->dtoData->videos : []),
+                ...$images,
+                ...$videos,
             ], $product->id);
 
             DB::commit();
@@ -63,29 +64,24 @@ class ProductService extends BaseService
         }
     }
 
-    public function update()
+    public function update(array $data, int $productId)
     {
         DB::beginTransaction();
         try {
-            $productDTO = $this->dtoData;
-            $product = $this->repository->find($productDTO->id);
+            $product = $this->repository->find($productId);
             abort_if(!$product, 404, 'Product not found');
 
-            $product->update(
-                $productDTO->toArray(['videos', 'images'], true)
-            );
+            $media = isset($data['images']) ? $data['images'] : [];
+            $videos = isset($data['videos']) ? $data['videos'] : [];
+            unset($data['images'], $data['videos']);
 
-            $media = [];
+            $product->update($data);
 
-            if(isset($this->dtoData->images)) {
-                $media = $this->dtoData->images;
+            if(count($videos)) {
+                $media = array_merge($media, $videos);
             }
 
-            if(isset($this->dtoData->videos)) {
-                $media = array_merge($media, $this->dtoData->videos);
-            }
-
-            $this->mediaRepository->updateMedia($media, $productDTO->id);
+            $this->mediaRepository->updateMedia($media, $productId);
 
             DB::commit();
 
@@ -151,35 +147,6 @@ class ProductService extends BaseService
                 env_dependend_error($e->getMessage())
             );
         }
-    }
-
-    /**
-     * Insert data from request into DTO objects
-     *
-     * @param array $data
-     * @param integer|null $id
-     * @return static
-     */
-    public function insertIntoDTO(array $data, int $id = null)
-    {
-        // if (isset($data['media']) && count($data['media'])) {
-        //     $media = [];
-        //     foreach ($data['media'] as $image) {
-        //         $media[] = new UploadableImageDTO(['image' => $image]);
-        //     }
-
-        //     $data['media'] = $media;
-        // }
-
-        // if ($data['values']) {}
-
-        if ($id) {
-            $data['id'] = $id;
-        }
-
-        $this->dtoData = new ProductDTO($data);
-
-        return $this;
     }
 
     protected function saveSkuAttributeValues(array $attributeValues, int $skuId)

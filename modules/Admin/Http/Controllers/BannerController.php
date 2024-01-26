@@ -34,9 +34,7 @@ class BannerController extends Controller
         can_user('Store Banners');
         if ($request->isMethod('POST')) {
             $data = $request->validated();
-            return $this->service
-                        ->insertIntoDTO($data)
-                        ->create();
+            return $this->service->create($data);
         }
     }
 
@@ -58,9 +56,7 @@ class BannerController extends Controller
         $data = $request->validated();
         $banner = (int)$banner;
 
-        return $this->service
-                    ->insertIntoDTO($data, $banner)
-                    ->update($banner);
+        return $this->service->update($data, $banner);
     }
 
     /**

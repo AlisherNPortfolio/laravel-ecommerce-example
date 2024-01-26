@@ -15,8 +15,6 @@ use PDOException;
 
 class BannerService extends BaseService
 {
-    private BannerDTO $data;
-
     public function __construct(
         protected IBannerRepository $repository,
         protected IBannerItemRepository $bannerItemRepository
@@ -30,20 +28,20 @@ class BannerService extends BaseService
         return $this->jsonSuccess(['data' => BannerResource::collection($data), 'count' => $count]);
     }
 
-    public function create()
+    public function create(array $data)
     {
         DB::beginTransaction();
         try {
             $bannerData = [
-                'name' => $this->data->name,
-                'slug' => $this->data->slug,
-                'is_active' => $this->data->is_active,
+                'name' => $data['name'],
+                'slug' => $data['slug'],
+                'is_active' => $data['is_active'],
             ];
 
             $createdBanner = $this->repository->create($bannerData);
 
-            if (isset($this->data->banners)) {
-                foreach ($this->data->banners as $item) {
+            if (isset($data['banners'])) {
+                foreach ($data['banners'] as $item) {
                     $this->bannerItemRepository->createWithImage([...$item->toArray(), 'banner_id' => $createdBanner->id]);
                 }
             }
@@ -70,7 +68,7 @@ class BannerService extends BaseService
         return $this->jsonSuccess(['data' => $banner]);
     }
 
-    public function update(int $id)
+    public function update(array $data, int $id)
     {
         abort_if(!$id, 400, 'ID must be an integer');
 
@@ -80,13 +78,13 @@ class BannerService extends BaseService
             abort_if(!$banner, 404, 'Resource not found!');
 
             $banner->update([
-                'name' => $this->data->name,
-                'slug' => $this->data->slug,
-                'is_active' => $this->data->is_active
+                'name' => $data['name,'],
+                'slug' => $data['slug,'],
+                'is_active' => $data['is_active'],
             ]);
 
-            if (isset($this->data->banners)) {
-                foreach ($this->data->banners as $item) {
+            if (isset($data['banners'])) {
+                foreach ($data['banners'] as $item) {
                     $this->bannerItemRepository->updateWithImage($item->toArray(), $item->id);
                 }
             }
@@ -131,28 +129,5 @@ class BannerService extends BaseService
                 env_dependend_error($e->getMessage())
             );
         }
-    }
-
-    public function insertIntoDTO(array $data, int $id = null)
-    {
-        if (isset($data['banners'])) {
-            $items = [];
-
-            foreach ($data['banners'] as $item) {
-                if ($id) $item['banner_id'] = $id;
-                $bannerItemDTO = new BannerItemDTO($item);
-                $items[] = $bannerItemDTO;
-            }
-
-            $data['banners'] = $items;
-        }
-
-        if ($id) {
-            $data['id'] = $id;
-        }
-
-        $this->data = new BannerDTO($data);
-
-        return $this;
     }
 }

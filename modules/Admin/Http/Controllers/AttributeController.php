@@ -47,8 +47,7 @@ class AttributeController extends Controller
     {
         $data = $request->validated();
         return $this->service
-                    ->insertIntoDTO($data)
-                    ->add();
+                    ->add($data);
     }
 
     /**
@@ -81,8 +80,7 @@ class AttributeController extends Controller
     {
         $data = $request->validated();
         return $this->service
-                    ->insertIntoDTO($data, (int)$attribute)
-                    ->update();
+                    ->update($data, (int)$attribute);
     }
 
     /**
@@ -97,7 +95,7 @@ class AttributeController extends Controller
 
     /**
      * Get All attributes
-     * 
+     *
      * @return JsonResponse
      */
     public function getAll()
